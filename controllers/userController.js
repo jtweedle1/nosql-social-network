@@ -28,24 +28,13 @@ module.exports = {
         .then((user) => res.json(user))
         .catch((err) => res.status(500).json(err));
     },
-    // delete a user and remove their associated thoughts
-    deleteStudent(req, res) {
-      Student.findOneAndRemove({ _id: req.params.studentId })
-        .then((student) =>
-          !student
-            ? res.status(404).json({ message: 'No such student exists' })
-            : Course.findOneAndUpdate(
-                { students: req.params.studentId },
-                { $pull: { students: req.params.studentId } },
-                { new: true }
-              )
-        )
-        .then((course) =>
-          !course
-            ? res.status(404).json({
-                message: 'Student deleted, but no courses found',
-              })
-            : res.json({ message: 'Student successfully deleted' })
+    // delete a user
+    deleteUser(req, res) {
+      User.findOneAndRemove({ _id: req.params.userId })
+        .then((user) =>
+          !user
+            ? res.status(404).json({ message: 'No such user exists' })
+            : res.json(user)
         )
         .catch((err) => {
           console.log(err);
@@ -53,37 +42,38 @@ module.exports = {
         });
     },
   
-    // Add an assignment to a student
-    addAssignment(req, res) {
-      console.log('You are adding an assignment');
+    // add a thought to a user
+    addThought(req, res) {
+      console.log('You are adding a new thought!');
       console.log(req.body);
-      Student.findOneAndUpdate(
-        { _id: req.params.studentId },
-        { $addToSet: { assignments: req.body } },
+      User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $addToSet: { thoughts: req.body } },
         { runValidators: true, new: true }
       )
-        .then((student) =>
-          !student
+        .then((user) =>
+          !user
             ? res
                 .status(404)
-                .json({ message: 'No student found with that ID :(' })
-            : res.json(student)
+                .json({ message: 'No user found with that ID.' })
+            : res.json(user)
         )
         .catch((err) => res.status(500).json(err));
     },
-    // Remove assignment from a student
-    removeAssignment(req, res) {
-      Student.findOneAndUpdate(
-        { _id: req.params.studentId },
-        { $pull: { assignment: { assignmentId: req.params.assignmentId } } },
+    
+    //remove thought from user
+    removeThought(req, res) {
+      User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $pull: { thought: { thoughtId: req.params.thoughtId } } },
         { runValidators: true, new: true }
       )
-        .then((student) =>
-          !student
+        .then((user) =>
+          !user
             ? res
                 .status(404)
-                .json({ message: 'No student found with that ID :(' })
-            : res.json(student)
+                .json({ message: 'No user found with that ID.' })
+            : res.json(user)
         )
         .catch((err) => res.status(500).json(err));
     },
